@@ -10,7 +10,7 @@ for i in dataset_indicatori:
     obj = {}
     for j in i:
         index = j.split(')',1)[0]
-        if (index == "2" or index == "3" or index == "4" or index == "9" or index == "14" or index == "15" or index == "18" or index == "28" or index == "35" or index == "40" or index == "41"):
+        if (index == "2" or index == "3" or index == "4" or index == "9" or index == "14" or index == "15" or index == "18" or index == "26" or  index == "27" or index == "28" or index == "35" or index == "40" or index == "41"):
             obj[j.split(')',1)[0]] = i.get(j)
         elif (index == "1"):
             obj["sez"] = i.get(j)
@@ -21,7 +21,8 @@ for i in dataset_indicatori:
 #Data sorting
 indicatori = {"legenda":["1) Numero medio di residenti per edificio ad uso residenziale","2) Numero medio di abitazioni per edificio ad uso residenziale",
 "3) Numero medio di abitazioni occupate da residenti per edificio ad uso residenziale","8) Percentuale di bambini in età prescolare","13) Percentuale di abitazioni non occupate",
-"14) Percentuale di famiglie monogenitore","17) Percentuale di 65+ che vivono da soli","27) Percentuale di popolazione 15+ che percepisce reddito sul totale della popolazione 15+",
+"14) Percentuale di famiglie monogenitore","17) Percentuale di 65+ che vivono da soli","25) Giovani (0-14 anni) ogni 100 in età attiva (15-64anni)",
+"26) Over65 enni ogni 100 persone in età attiva (15-64 anni) ","27) Percentuale di popolazione 15+ che percepisce reddito sul totale della popolazione 15+",
 "34) Percentuale di popolazione residente che si sposta giornalmente per studio o lavoro","39) Numero medio di componenti delle famiglie",
 "40) Percentuale di famiglie di un componente"],"indicatori":[]}
 for i in list:
@@ -44,16 +45,20 @@ for i in range (0, temp+1):
         if (j.get("properties").get("SEZ") == i):
             ordered.append(j)
 
-#ordered_2 = []
-#for i in indicatori.get("indicatori"):
-#    for j in ordered:
-#        if (int(i.get("sez")) == int(j.get("properties").get("SEZ"))):
-#            j["indicatori"] = i
-#            ordered_2.append(j)
-#for i in ordered_2: i.get("indicatori").pop("sez")
-
-dataset_censimento["features"] = ordered
 with open("Censimento_Milano_2011/censimento_cleared.geojson", 'x') as outfile:
     json.dump(dataset_censimento, outfile, indent=1)
 with open("Indicatori/indicatori_cleared.json", 'x') as outfile:
     json.dump(indicatori, outfile, indent=1)
+
+ordered_2 = []
+for i in indicatori.get("indicatori"):
+    for j in ordered:
+        if (int(i.get("sez")) == int(j.get("properties").get("SEZ"))):
+            j["indicatori"] = i
+            ordered_2.append(j)
+ 
+for i in ordered_2: i.get("indicatori").pop("sez")
+dataset_censimento["features"] = ordered_2
+
+with open("dataset_completo.geojson", 'x') as outfile:
+    json.dump(dataset_censimento, outfile, indent=1)
