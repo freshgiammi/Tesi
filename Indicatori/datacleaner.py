@@ -11,7 +11,10 @@ for i in dataset_indicatori:
     for j in i:
         index = j.split(')',1)[0]
         if (index == "2" or index == "3" or index == "4" or index == "9" or index == "14" or index == "15" or index == "18" or index == "26" or  index == "27" or index == "28" or index == "35" or index == "40" or index == "41"):
-            obj[j.split(')',1)[0]] = i.get(j)
+            if (i.get(j)!= None):
+                obj[j.split(')',1)[0]] = i.get(j).replace(',','.')
+            else:
+                obj[j.split(')',1)[0]] = i.get(j)
         elif (index == "1"):
             obj["sez"] = i.get(j)
         else:
