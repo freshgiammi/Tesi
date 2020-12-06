@@ -837,17 +837,17 @@ for i in censimento.get("features"):
         popolazione_famiglie -= 6
         generated_families.append(fam)
 
-    print()
-    print()
-    print("---")
-    print("Giovani:",giovani)
-    print("Attivi:",attivi)
-    print("Anziani:",anziani)
-    print("Famiglie:",famiglie)
-    print("Popolazione rimasta:",popolazione_famiglie)
-    print("---")
-    print()
-    print()
+    #print()
+    #print()
+    #print("---")
+    #print("Giovani:",giovani)
+    #print("Attivi:",attivi)
+    #print("Anziani:",anziani)
+    #print("Famiglie:",famiglie)
+    #print("Popolazione rimasta:",popolazione_famiglie)
+    #print("---")
+    #print()
+    #print()
 
     #Check that all members of the i-sezione have been allocated to a family
     if (anziani != 0 or giovani != 0 or attivi != 0 or popolazione_famiglie != 0):

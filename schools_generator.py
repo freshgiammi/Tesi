@@ -34,19 +34,15 @@ points_medie = {}
 points_superiori = {}
 
 for i in infanzia.get("features"):
-    i["size"] = 0
     db_infanzia.insert_one(i)
     points_infanzia[i.get("_id")] = Point(i.get("geometry").get("coordinates"))
 for i in elementari.get("features"):
-    i["size"] = 0
     db_elementari.insert_one(i)
     points_elementari[i.get("_id")] = Point(i.get("geometry").get("coordinates"))
 for i in medie.get("features"):
-    i["size"] = 0
     db_medie.insert_one(i)
     points_medie[i.get("_id")] = Point(i.get("geometry").get("coordinates"))
 for i in superiori.get("features"):
-    i["size"] = 0
     db_superiori.insert_one(i)
     points_superiori[i.get("_id")] = Point(i.get("geometry").get("coordinates"))
 
