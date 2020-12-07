@@ -837,6 +837,8 @@ for i in censimento.get("features"):
         popolazione_famiglie -= 6
         generated_families.append(fam)
 
+#DEBUG CODE SECTION START
+
     #print()
     #print()
     #print("---")
@@ -847,7 +849,9 @@ for i in censimento.get("features"):
     #print("Popolazione rimasta:",popolazione_famiglie)
     #print("---")
     #print()
-    #print()
+
+#DEBUG CODE SECTION END
+    print()
 
     #Check that all members of the i-sezione have been allocated to a family
     if (anziani != 0 or giovani != 0 or attivi != 0 or popolazione_famiglie != 0):
