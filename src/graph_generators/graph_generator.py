@@ -30,7 +30,7 @@ db_medie = db['scuole_medie']
 db_superiori = db['scuole_superiori']
 
 graph = nx.Graph()
-print("Generating graph.")
+print("Loading database into memory...")
 sez = list(db_sezioni.find())
 max_sez = max([i["properties"]["SEZ"] for i in sez])
 
@@ -78,7 +78,7 @@ print("Creating workplace layer edges...")
 for i in sez:
     print("Current section:",i["properties"]["SEZ"],"/",max_sez, end="\r", flush=True)
     if (keyPresent(i.keys(),"lavoratori") == True):
-        g = nx.erdos_renyi_graph(len(i["lavoratori"]),0.1)
+        g = nx.erdos_renyi_graph(len(i["lavoratori"]),0.15)
         mapped = {}
         for index in range(0,len(i["lavoratori"])):
             mapped[list(g.nodes())[index]] = i["lavoratori"][index]
@@ -89,6 +89,7 @@ for i in sez:
         #        if (np.random.binomial(1, 0.1) == 1):
         #            if (graph.has_edge(lavoratore,lavoratore_next) == False and lavoratore != lavoratore_next):graph.add_edge(lavoratore,lavoratore_next)
 
+#Cleanup unneeded local variables
 del(db_elementari)
 del(db_infanzia)
 del(db_medie)
@@ -106,16 +107,26 @@ del(index)
 del(fam)
 del(i)
 
-
+#Graph should already be free of self loops
 print("Removing self edges...")
 graph.remove_edges_from(nx.selfloop_edges(graph))
 
+#Graph should already be undirected
 #print("Converting to undirected graph...")
 #graph = nx.convert_node_labels_to_integers(graph.to_undirected())
 
 print("total nodes:",len(graph.nodes()))
 print("total edges:",len(graph.edges()))
 
-print("Generating GraphML...")
-nx.write_gml(graph, "dataset.gml")
+#This turns UUIDs to sequential IDs
+relabeled = nx.convert_node_labels_to_integers(graph)
+del(graph)
+
+#print("Generating GraphML...")
+#nx.write_gml(relabeled, "dataset.gml")
+#print("Generating adjacency list...")
+#nx.write_adjlist(relabeled, "dataset.adjlist")
+print("Generating GPickle graph...")
+nx.write_gpickle(relabeled, "Datasets/dataset.gpickle")
+
 print("Done.")

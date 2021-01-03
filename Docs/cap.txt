@@ -1,0 +1,7 @@
+intro - alla fine
+cap_1 - state of art, introduco epidemiologia computazionale con network-based, carrellata sui
+3 approcci (tesi in eng), introduco approccio compartimentale, approccio agent-based, approccio network-based, fine cap: breve riass sull'articolo di moreno come esempio,
+cap_2 - descrizione modelli di diffusione (SIR, SEIRS, SWIR, seircustom)
+cap_3 - Descrizione dei dati raccolti (Demografico, scolastico e lavorativo)
+cap_4 - Simulazione (pseudocodice rete) + custom model
+cap_5 - Results
