@@ -289,7 +289,7 @@ for i in censimento.get("features"):
             members = generate_member("20-64",1,members)[0]
             attivi -= 1
         #TODO: Check for more data, not sure this is good
-        if (famiglie["6"] != 0 and giovani > 3):
+        if (famiglie["6"] > 0 and giovani > 3):
             if (giovani > 3):
                 members, fasce = generate_member("0-19",4,members,fasce)
                 giovani -= 4
@@ -305,7 +305,7 @@ for i in censimento.get("features"):
                 anziani -= 2
             famiglie["6"] -= 1
             popolazione_famiglie -= 6
-        elif (famiglie["5"] != 0 and giovani > 2):
+        elif (famiglie["5"] > 0 and giovani > 2):
             if (giovani > 2):
                 members, fasce = generate_member("0-19",3,members,fasce)
                 giovani -= 3
@@ -321,7 +321,7 @@ for i in censimento.get("features"):
                 anziani -= 2
             famiglie["5"] -= 1
             popolazione_famiglie -= 5
-        elif (famiglie["4"] != 0 and giovani > 1):
+        elif (famiglie["4"] > 0 and giovani > 1):
             #SIM
             if (giovani > 2 and simulated == True and len(members) == 1):
                 members, fasce = generate_member("0-19",3,members,fasce)
@@ -337,7 +337,7 @@ for i in censimento.get("features"):
                 anziani -= 1
             famiglie["4"] -= 1
             popolazione_famiglie -= 4
-        elif (famiglie["3"] != 0 and giovani > 0):
+        elif (famiglie["3"] > 0 and giovani > 0):
             #SIM
             if (giovani > 1 and simulated == True and len(members) == 1):
                 members, fasce = generate_member("0-19",2,members,fasce)
@@ -649,6 +649,7 @@ for i in censimento.get("features"):
         else:
             print("Skipped:",skipped)
             print(generated_families)
+            debug = True
             if (debug == True):
                 #DEBUG CODE SECTION START
                 print()

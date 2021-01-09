@@ -80,8 +80,6 @@ for i in dataset_censimento.get("features"):
     i["indicatori"]["fasce"] = fasce_ordered.get(str(i.get("properties").get("SEZ")))   
     i["indicatori"]["famiglie"] =famiglie_ordered.get(str(i.get("properties").get("SEZ"))) 
 
-print("Sezioni generated. Dumping to db...")
-
 #Sort sezioni by properties.SEZ
 sezioni = sorted([int(i.get("properties").get("SEZ")) for i in dataset_censimento.get("features")])
 dataset_cleared = []
