@@ -1,5 +1,7 @@
 from pymongo import MongoClient
 import networkx as nx
+import numpy as np
+import sys
 
 def keyPresent(keys,word):
     for i in keys:
@@ -19,7 +21,7 @@ def generateClassClique(cl):
     for alunno in cl["alunni"]:
         class_graph.add_node(alunno)
     G = (nx.complete_graph(list(class_graph.nodes())))
-    return list(G.edges())
+    return G
 
 client = MongoClient('localhost', 27017)
 db = client['tesi']
@@ -45,34 +47,59 @@ for i in sez:
             generated_graph = generateFamilyClique(fam)
             graph.add_nodes_from(generated_graph.nodes())
             graph.add_edges_from(generated_graph.edges())
+            if (len(list(generated_graph.edges()))) != 0:
+                for e in list(generated_graph.edges()):
+                    graph.edges[e]['weight'] = 1
+                #print(nx.get_edge_attributes(graph,'weight'))
+            
 
 print("Creating scuole_infanzia layer edges...")
 school_size = len(list(db_infanzia.find()))
 for i in list(db_infanzia.find()):
-    print("Current school:",list(db_infanzia.find()).index(i),"/",school_size, end="\r", flush=True)
+    #print("Current school:",list(db_infanzia.find()).index(i),"/",school_size, end="\r", flush=True)
     for classe in i["classi"]:
-        graph.add_edges_from(generateClassClique(classe))
+        generated_graph = generateClassClique(classe)
+        graph.add_edges_from(generated_graph.edges())
+        if (len(list(generated_graph.edges()))) != 0:
+            for e in list(generated_graph.edges()):
+                graph.edges[e]['weight'] = np.random.random_sample()
+            #print(nx.get_edge_attributes(graph,'weight'))
 
 print("Creating scuole_elementari layer edges...")
 school_size = len(list(db_elementari.find()))
 for i in list(db_elementari.find()):
     print("Current school:",list(db_elementari.find()).index(i),"/",school_size, end="\r", flush=True)
     for classe in i["classi"]:
-        graph.add_edges_from(generateClassClique(classe))
+        generated_graph = generateClassClique(classe)
+        graph.add_edges_from(generated_graph.edges())
+        if (len(list(generated_graph.edges()))) != 0:
+            for e in list(generated_graph.edges()):
+                graph.edges[e]['weight'] = np.random.random_sample()
+            #print(nx.get_edge_attributes(graph,'weight'))
 
 print("Creating scuole_media layer edges...")
 school_size = len(list(db_medie.find()))
 for i in list(db_medie.find()):
     print("Current school:",list(db_medie.find()).index(i),"/",school_size, end="\r", flush=True)
     for classe in i["classi"]:
-        graph.add_edges_from(generateClassClique(classe))
+        generated_graph = generateClassClique(classe)
+        graph.add_edges_from(generated_graph.edges())
+        if (len(list(generated_graph.edges()))) != 0:
+            for e in list(generated_graph.edges()):
+                graph.edges[e]['weight'] = np.random.random_sample()
+            #print(nx.get_edge_attributes(graph,'weight'))
 
 print("Creating scuole_superiori layer edges...")
 school_size = len(list(db_superiori.find()))
 for i in list(db_superiori.find()):
     print("Current school:",list(db_superiori.find()).index(i),"/",school_size, end="\r", flush=True)
     for classe in i["classi"]:
-        graph.add_edges_from(generateClassClique(classe))
+        generated_graph = generateClassClique(classe)
+        graph.add_edges_from(generated_graph.edges())
+        if (len(list(generated_graph.edges()))) != 0:
+            for e in list(generated_graph.edges()):
+                graph.edges[e]['weight'] = np.random.random_sample()
+            #print(nx.get_edge_attributes(graph,'weight'))
 
 print("Creating workplace layer edges...")
 for i in sez:
@@ -84,6 +111,11 @@ for i in sez:
             mapped[list(g.nodes())[index]] = i["lavoratori"][index]
         g_2 = nx.relabel_nodes(g, mapped)
         graph.add_edges_from(g_2.edges())
+        if (len(list(g_2.edges()))) != 0:
+            for e in list(g_2.edges()):
+                graph.edges[e]['weight'] = np.random.random_sample()
+            #print(nx.get_edge_attributes(graph,'weight'))
+
         #for lavoratore in i["lavoratori"]:
         #    for lavoratore_next in i["lavoratori"]:
         #        if (np.random.binomial(1, 0.1) == 1):
