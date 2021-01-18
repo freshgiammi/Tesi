@@ -57,7 +57,6 @@ class SEIR_ASModel(CustomDiffusionModel):
         self.clean_initial_status(self.available_statuses.values())
 
         actual_status = {node: nstatus for node, nstatus in future.utils.iteritems(self.status)}
-
         if self.actual_iteration == 0:
             self.actual_iteration += 1
             delta, node_count, status_delta = self.status_delta(actual_status)
@@ -67,7 +66,7 @@ class SEIR_ASModel(CustomDiffusionModel):
             else:
                 return {"iteration": 0, "status": {},
                         "node_count": node_count.copy(), "status_delta": status_delta.copy()}
-
+        
         for u in self.graph.nodes:
 
             u_status = self.status[u]
@@ -81,6 +80,10 @@ class SEIR_ASModel(CustomDiffusionModel):
                 infected_neighbors = [v for v in neighbors if self.status[v] == 3 or self.status[v] == 4]
                 triggered = 1 if len(infected_neighbors) > 0 else 0
 
+                #Build edges weight list, use np.mean as multiplier constant for beta value
+                #TODO: Check next step
+                mean_infection_weight = np.mean([self.graph.edges[(u,v)]['weight'] for v in infected_neighbors]) if len(infected_neighbors) > 0 else 0
+
                 if self.params['model']['tp_rate'] == 1:
                     if eventp < 1 - (1 - self.params['model']['beta']) ** len(infected_neighbors):
                         #Toss a coin for A/S
@@ -90,7 +93,7 @@ class SEIR_ASModel(CustomDiffusionModel):
                         else:
                             actual_status[u] = 1  # Exposed_A                  
                 else:
-                    if eventp < self.params['model']['beta'] * triggered:
+                    if eventp < self.params['model']['beta'] * triggered * mean_infection_weight:
                         #Toss a coin for A/S
                         eventp = np.random.random_sample()
                         if eventp < self.params['model']['kappa']:
