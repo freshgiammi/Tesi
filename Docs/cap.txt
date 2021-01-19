@@ -5,3 +5,15 @@ cap_2 - descrizione modelli di diffusione (SIR, SEIRS, SWIR, seircustom)
 cap_3 - Descrizione dei dati raccolti (Demografico, scolastico e lavorativo)
 cap_4 - Simulazione (pseudocodice rete) + custom model
 cap_5 - Results
+
+
+network : simulazione mobilità
+agent: rete outcome della mobilità, modello la mobilità
+
+
+peso scolastico < famiglia []
+peso lavorativo << famiglia []
+
+- modello su grafo pesato [0,1] con \beta scontato rispetto al peso 
+- generare grafo pesato
+- distanza famiglie simulate
