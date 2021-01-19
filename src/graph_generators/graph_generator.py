@@ -40,7 +40,7 @@ print("Creating nodes and family layers edges...")
 for i in sez:
     print("Current section:",i["properties"]["SEZ"],"/",max_sez, end="\r", flush=True)
     if (keyPresent(i.keys(),"famiglie") == True):
-        for fam in i["famiglie"]:
+        for fam in i["famiglie"]:\
             #print("Composing graph:",i["famiglie"].index(fam))
             #graph = nx.compose(graph, generateFamilyClique(fam))
             #print("graph composed")
@@ -50,6 +50,9 @@ for i in sez:
             if (len(list(generated_graph.edges()))) != 0:
                 for e in list(generated_graph.edges()):
                     graph.edges[e]['weight'] = 1
+            for mem in fam["members"]:
+                graph.nodes[mem["uuid"]]['age'] = mem["age"]
+                graph.nodes[mem["uuid"]]['family_id'] = fam["family_id"]
                 #print(nx.get_edge_attributes(graph,'weight'))
             
 
