@@ -78,7 +78,8 @@ skipped = 0
 for i in censimento.get("features"):
 
     #Sez-2350 has a mismatch in solo 65+ familiesd
-    if (i.get("properties").get("SEZ") == 453 or i.get("properties").get("SEZ") == 2350 or i.get("properties").get("SEZ") == 3755 or i.get("properties").get("SEZ") == 4191 or i.get("properties").get("SEZ") == 5072):
+    if (i.get("properties").get("SEZ") == 453 or i.get("properties").get("SEZ") == 2350 or i.get("properties").get("SEZ") == 3755 or i.get("properties").get("SEZ") == 4191 or i.get("properties").get("SEZ") == 4982 or i.get("properties").get("SEZ") == 5072):
+        skipped += 1
         continue
 
     #Create shortcuts for quick access
@@ -523,6 +524,3 @@ for i in censimento.get("features"):
 print("Sezioni saltate per via di malformazioni tra famiglie e fasce:",skipped)
 print("Sezioni simulate: ",len(simulated_distribution))
 print(np.mean(simulated_distribution))
-
-
-
