@@ -20,20 +20,25 @@ def generate_member(age,quantity,memberlist,agegroup=None):
             young_percent = []
             for j in young:
                 young_percent.append((young[j]/sum(young.values())))
-            index = np.random.choice([0,1,2,3],1,p=young_percent)
-            if (index == 0):
-                age = "0-5"
-                agegroup[age] -= 1
-            if (index == 1):
-                age = "5-9"
-                agegroup[age] -= 1
-            if (index == 2):
-                age = "10-14"
-                agegroup[age] -= 1
-            if (index == 3):
-                age = "15-19"
-                agegroup[age] -= 1
-        person["age"] = age
+            pick = np.random.choice([0,1,2,3],1,p=young_percent)
+            if (pick == 0):
+                age_pick = "0-5"
+                agegroup[age_pick] -= 1
+                person["age"] = age_pick
+            if (pick == 1):
+                age_pick = "5-9"
+                agegroup[age_pick] -= 1
+                person["age"] = age_pick
+            if (pick == 2):
+                age_pick = "10-14"
+                agegroup[age_pick] -= 1
+                person["age"] = age_pick
+            if (pick == 3):
+                age_pick = "15-19"
+                agegroup[age_pick] -= 1
+                person["age"] = age_pick
+        else:
+            person["age"] = age
         memberlist.append(person)
     return memberlist,agegroup
 
@@ -58,7 +63,7 @@ def generate_family(mem,id_fam,sez,giov,att,anz,pop,famiglie_db):
         print(famiglie)
         print(fasce)
         print(fam)
-        print(giovani,attivi,anziani)
+        print(giov,att,anz)
     return fam, id_fam, giov, att, anz, pop, famiglie_db
 
 censimento = json.load(open('Datasets/dataset_completo.geojson'))
@@ -119,7 +124,7 @@ for i in censimento.get("features"):
                 if (sum(fasce_def.values()) == popolazione_famiglie):
                     flag = True
                     break;
-        
+
         simulated = True
         #TODO: Track simulated sezioni to get an estimate distance for age distribution
         fasce_def_percent = {}
@@ -159,10 +164,11 @@ for i in censimento.get("features"):
         print("Composizione delle famiglie:",famiglie)
         print("Composizione delle fasce:",fasce)
         print("Totale popolazione:",sum(fasce.values()))
+        if simulated == True: print("SIMULATED")
         print()
 
     generated_families = []
-
+    num_of_fam = famiglie["tot_famiglie"]
     #Generate solo 65+ families
     for j in range(0,round((anziani/100)*indicatori.get("17"))):
         members = []
@@ -190,58 +196,6 @@ for i in censimento.get("features"):
             members = generate_member("65+",2,members)[0]
             fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
             generated_families.append(fam)
-
-    #Generate families of 2 out of one-parent families
-    for j in range(0,round((giovani/100)*indicatori.get("14"))):
-        members = []
-        #If there are no parents, create families of kids and grandparents
-        if (attivi > 0):
-            members = generate_member("20-64",1,members)[0]
-            attivi -= 1 # Temporarily remove for consistency
-            if (famiglie["6"] > 0 and giovani > 4):
-                if (giovani > 2 and anziani > 1):
-                    members, fasce = generate_member("0-19",3,members,fasce)
-                    members = generate_member("65+",2,members)[0]
-                elif (giovani > 3 and anziani > 0):
-                    members, fasce = generate_member("0-19",4,members,fasce)
-                    members = generate_member("65+",1,members)[0]
-                elif (giovani > 4 and anziani == 0):
-                    members, fasce = generate_member("0-19",5,members,fasce)
-            elif (famiglie["5"] > 0 and giovani > 3):
-                if (giovani > 1 and anziani > 1):
-                    members, fasce = generate_member("0-19",2,members,fasce)
-                    members = generate_member("65+",2,members)[0]
-                elif (giovani > 2 and anziani > 0):
-                    members, fasce = generate_member("0-19",3,members,fasce)
-                    members = generate_member("65+",1,members)[0]
-                elif (giovani > 3):
-                    members, fasce = generate_member("0-19",4,members,fasce)
-            elif (famiglie["4"] > 0):
-                if (giovani > 0 and anziani > 1):
-                    members, fasce = generate_member("0-19",1,members,fasce)
-                    members = generate_member("65+",2,members)[0]
-                elif (giovani > 1 and anziani > 0):
-                    members, fasce = generate_member("0-19",2,members,fasce)
-                    members = generate_member("65+",1,members)[0]
-                elif (giovani > 2):
-                    members, fasce = generate_member("0-19",3,members,fasce)
-            elif (famiglie["3"] > 0):
-                if (giovani > 0 and anziani > 0):
-                    members, fasce = generate_member("0-19",1,members,fasce)
-                    members = generate_member("65+",1,members)[0]
-                elif (giovani > 1):
-                    members, fasce = generate_member("0-19",2,members,fasce)
-            elif (famiglie["2"] > 0 and giovani > 0):
-                members, fasce = generate_member("0-19",1,members,fasce)
-            if (len(members) != 1):
-                attivi +=1 # Add temp value back
-                fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
-                generated_families.append(fam)
-            else:
-                attivi += 1
-                break
-        else:
-            break
 
     #Allocate 0-19 to families
     for j in range(0,giovani):
@@ -294,6 +248,9 @@ for i in censimento.get("features"):
                 members, fasce = generate_member("0-19",2,members,fasce)
             else:    
                 members, fasce = generate_member("0-19",1,members,fasce)
+        elif (famiglie["2"] > 0 and giovani > 0):
+            if (giovani > 0 and len(members) == 1):
+                members, fasce = generate_member("0-19",1,members,fasce)
         if (len(members) > 2):
             for k in members:
                 if (k.get("age") == "20-64"):
@@ -308,22 +265,24 @@ for i in censimento.get("features"):
                     attivi += 1
                 elif (k.get("age") == "65+"):
                     anziani += 1
+                else:
+                    fasce[k.get("age")] += 1
+
 
     #Complete remaining families of 2
     for j in range(0,famiglie["2"]):
         members = []
-        if (anziani > 0 and attivi > 0):
+        if (giovani > 0 and attivi > 0):
+            members, fasce = generate_member("0-19",1,members,fasce)
+            members = generate_member("20-64",1,members)[0]
+        elif (giovani > 0 and anziani > 0):
+            members, fasce = generate_member("0-19",1,members,fasce)
+            members = generate_member("65+",1,members)[0]
+        elif (anziani > 0 and attivi > 0):
             members = generate_member("65+",1,members)[0]
             members = generate_member("20-64",1,members)[0]
         elif (anziani == 0 and attivi > 1):
             members = generate_member("20-64",2,members)[0]
-        elif (giovani == 1 and attivi > 0):
-            members, fasce = generate_member("0-19",1,members,fasce)
-            members = generate_member("20-64",1,members)[0]
-        elif (giovani == 1 and anziani > 0):
-            members, fasce = generate_member("0-19",1,members,fasce)
-            members = generate_member("65+",1,members)[0]
-        #SIM
         elif (giovani > 0 and attivi > 0 and simulated == True):
             members, fasce = generate_member("0-19",1,members,fasce)
             members = generate_member("20-64",1,members)[0]
@@ -334,10 +293,18 @@ for i in censimento.get("features"):
     #Generate families of 3 components
     for j in range(0,famiglie["3"]):
         members = []
-        if (giovani == 1 and attivi > 1):
+        if (giovani > 0 and attivi > 1):
             #In case we're left with one under-19, allocate it here
             members = generate_member("20-64",2,members)[0]
             members, fasce = generate_member("0-19",1,members,fasce)
+        elif (giovani > 1 and attivi > 0):
+            #In case we're left with two under-19, allocate it here
+            members, fasce = generate_member("0-19",2,members,fasce)
+            members = generate_member("20-64",1,members)[0]
+        elif (giovani > 1 and anziani > 0):
+            #In case we're left with two under-19, allocate it here
+            members, fasce = generate_member("0-19",2,members,fasce)
+            members = generate_member("65+",1,members)[0]
         elif (attivi > 2 and anziani == 0):
             members = generate_member("20-64",3,members)[0]
         elif (attivi > 1 and anziani > 0):
@@ -354,15 +321,29 @@ for i in censimento.get("features"):
    #Generate families of 4 components
     for j in range(0,famiglie["4"]):
         members = []
-        if (giovani == 1 and attivi > 1):
+        if (giovani == 1 and attivi > 1 and anziani > 0):
             #In case we're left with one under-19, allocate it here
-            members = generate_member("20-64",3,members)[0]
+            members = generate_member("20-64",2,members)[0]
+            members = generate_member("65+",1,members)[0]
             members, fasce = generate_member("0-19",1,members,fasce)
         elif (giovani == 1 and attivi > 0 and anziani > 1):
             #In case we're left with one under-19, allocate it here
             members = generate_member("20-64",1,members)[0]
             members = generate_member("65+",2,members)[0]
             members, fasce = generate_member("0-19",1,members,fasce)
+        elif (giovani == 1 and attivi > 1):
+            #In case we're left with one under-19, allocate it here
+            members = generate_member("20-64",3,members)[0]
+            members, fasce = generate_member("0-19",1,members,fasce)
+        elif (giovani == 2 and attivi > 0 and anziani > 0):
+            #In case we're left with two under-19, allocate it here
+            members = generate_member("20-64",2,members)[0]
+            members = generate_member("65+",1,members)[0]
+            members, fasce = generate_member("0-19",1,members,fasce)
+        elif (giovani == 3 and attivi > 0):
+            #In case we're left with two under-19, allocate it here
+            members = generate_member("20-64",1,members)[0]
+            members, fasce = generate_member("0-19",3,members,fasce)
         elif (anziani == 1 and attivi > 1):
             #In case we're left with one 65+, allocate it here
             members = generate_member("20-64",3,members)[0]
@@ -513,6 +494,7 @@ for i in censimento.get("features"):
                 print("---")
                 print()
                 #DEBUG CODE SECTION END
+                #TODO: Discard sez if we have solo under-19
             sys.exit("BINGO I FUCKED UP: Popolation Count Mismatch")
     else:
         for family in generated_families:

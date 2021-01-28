@@ -1,3 +1,4 @@
+[THESIS]
 intro - alla fine
 cap_1 - state of art, introduco epidemiologia computazionale con network-based, carrellata sui
 3 approcci (tesi in eng), introduco approccio compartimentale, approccio agent-based, approccio network-based, fine cap: breve riass sull'articolo di moreno come esempio,
@@ -6,14 +7,14 @@ cap_3 - Descrizione dei dati raccolti (Demografico, scolastico e lavorativo)
 cap_4 - Simulazione (pseudocodice rete) + custom model
 cap_5 - Results
 
+[WEIGHTS]
+Peso scolastico < famiglia []
+Peso lavorativo << famiglia []
 
-network : simulazione mobilità
-agent: rete outcome della mobilità, modello la mobilità
+[HL]
+Calcolare istanza famiglie simulate
 
-
-peso scolastico < famiglia []
-peso lavorativo << famiglia []
-
-- modello su grafo pesato [0,1] con \beta scontato rispetto al peso 
-- generare grafo pesato
-- distanza famiglie simulate
+[MISC]
+Herd immunity all'interno della GC
+InfectedA/S come fascia di età
+Frazione di lavoratori per sezione (ECDF)
