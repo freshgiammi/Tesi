@@ -245,9 +245,13 @@ class CustomDiffusionModel(object):
                 number_of_initial_infected = self.graph.number_of_nodes() * float(self.params['model']['fraction_infected'])
                 available_nodes = [n for n in self.status if self.status[n] == 0]
                 sampled_nodes = np.random.choice(available_nodes, int(number_of_initial_infected), replace=False)
-
+                iis = int(number_of_initial_infected * self.params['model']['kappa']) #Symptomatic individuals at start point
                 for k in sampled_nodes:
-                    self.status[k] = self.available_statuses['Infected']
+                    if iis > 0:
+                        self.status[k] = self.available_statuses['Infected_S']
+                        iis -= 1
+                    else: 
+                        self.status[k] = self.available_statuses['Infected_A']
 
                 self.initial_status = self.status
             else:
