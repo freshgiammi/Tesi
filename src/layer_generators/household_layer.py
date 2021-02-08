@@ -20,23 +20,9 @@ def generate_member(age,quantity,memberlist,agegroup=None):
             young_percent = []
             for j in young:
                 young_percent.append((young[j]/sum(young.values())))
-            pick = np.random.choice([0,1,2,3],1,p=young_percent)
-            if (pick == 0):
-                age_pick = "0-5"
-                agegroup[age_pick] -= 1
-                person["age"] = age_pick
-            if (pick == 1):
-                age_pick = "5-9"
-                agegroup[age_pick] -= 1
-                person["age"] = age_pick
-            if (pick == 2):
-                age_pick = "10-14"
-                agegroup[age_pick] -= 1
-                person["age"] = age_pick
-            if (pick == 3):
-                age_pick = "15-19"
-                agegroup[age_pick] -= 1
-                person["age"] = age_pick
+            age_pick = list(np.random.choice(["0-5","5-9","10-14","15-19"],1,p=young_percent))[0]
+            agegroup[age_pick] -= 1
+            person["age"] = age_pick
         else:
             person["age"] = age
         memberlist.append(person)
@@ -126,22 +112,17 @@ for i in censimento.get("features"):
                     break;
 
         simulated = True
-        #TODO: Track simulated sezioni to get an estimate distance for age distribution
+        #Percentage for each fascia 
         fasce_def_percent = {}
         for f in fasce_def:
             fasce_def_percent[f] = fasce_def[f]/sum(fasce_def.values())
-        #print(fasce_percent)
-        #print(fasce_def_percent)
-        #print(list(fasce.values()))
-        #print(list(fasce_def.values()))
-
+        
+        #Percentage difference for each fascia between real and simulated 
         diff = {}
         for f in fasce:
-            diff[f] = fasce_percent[f]-fasce_def_percent[f]
-        #This returns 100%
-        #print(100-sum(diff.values()))
+            diff[f] = (fasce_percent[f]-fasce_def_percent[f])*100
 
-        simulated_distribution.append(np.mean(list(diff.values())))
+        simulated_distribution.append(float(np.mean(np.abs(list(diff.values())))))
         fasce = fasce_def
         #sys.exit()    
 
@@ -502,7 +483,24 @@ for i in censimento.get("features"):
             family.pop("sez")
             family.pop("_id")
         db_sezioni.find_one_and_update({'properties.SEZ':i.get("properties").get("SEZ") }, {'$set': {'famiglie': generated_families}})
-
+        #pass
 print("Sezioni saltate per via di malformazioni tra famiglie e fasce:",skipped)
 print("Sezioni simulate: ",len(simulated_distribution))
 print(np.mean(simulated_distribution))
+
+# ECDF linear scale
+#plt.style.use('default')
+#cdf = ECDF(simulated_distribution)
+#x = np.unique(simulated_distribution)
+#y = cdf(x)
+#fig_cdf = plt.figure(figsize=(15,10))
+#axes = fig_cdf.gca()
+#axes.plot(x,y,marker='o',ms=8,  linestyle='--')
+# general title
+#plt.suptitle('Differenza tra sezioni simulate e dataset reale', fontsize=13, fontweight=0, color='black', style='italic', y=0.92)
+#axes.set_xlabel('Percentuale',size=20)
+#axes.set_ylabel('ECDF', size = 20)
+#fig1 = plt.gcf()
+#plt.show()
+#plt.draw()
+#fig1.savefig('tessstttyyy.png', dpi=100)
