@@ -2,3 +2,4 @@ ndlibCustom/__pycache__/
 .vscode
 .ipynb_checkpoints
 Datasets/dataset.gpickle
+Datasets/dataset_noschools.gpickle

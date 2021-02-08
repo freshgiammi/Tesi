@@ -8,13 +8,16 @@ cap_4 - Simulazione (pseudocodice rete) + custom model
 cap_5 - Results
 
 [WEIGHTS]
-Peso scolastico < famiglia []
-Peso lavorativo << famiglia []
+Peso scolastico < famiglia [0.65-1.0]
+Peso lavorativo << famiglia [0.3-0.7]
 
 [HL]
-Calcolare istanza famiglie simulate
+Calcolare distanza famiglie simulate
+plot ecdf
 
 [MISC]
 Herd immunity all'interno della GC
 InfectedA/S come fascia di età
 Frazione di lavoratori per sezione (ECDF)
+
+np percnetile 5-95
