@@ -1,4 +1,7 @@
 ndlibCustom/__pycache__/
+src/dataset_generators/__pycache__/
+src/graph_generators/__pycache__/
+src/layer_generators/__pycache__/
 .vscode
 .ipynb_checkpoints
 Datasets/dataset.gpickle
