@@ -29,28 +29,38 @@ def generate_member(age,quantity,memberlist,agegroup=None):
     return memberlist,agegroup
 
 def generate_family(mem,id_fam,sez,giov,att,anz,pop,famiglie_db):
-    fam = {}
-    for i in mem:
-        if (i.get("age") == "65+"):
-            anz -= 1
-        elif (i.get("age") == "20-64"):
-            att -= 1
-        elif (i.get("age") == "0-5" or i.get("age") == "5-9" or i.get("age") == "10-14" or i.get("age") == "15-19"):
-            giov -= 1
-    fam["family_id"] = id_fam
-    fam["sez"] = sez
-    fam["members"] = mem
-    id_fam += 1
-    pop -= len(mem)
-    famiglie_db["tot_famiglie"] -= 1
-    famiglie_db[str(len(mem))] -= 1
-    if (debug == True):
-        print("Last generated family has a size of ",len(mem))
-        print(famiglie)
-        print(fasce)
-        print(fam)
-        print(giov,att,anz)
-    return fam, id_fam, giov, att, anz, pop, famiglie_db
+    try:
+        fam = {}
+        for i in mem:
+            if (i.get("age") == "65+"):
+                anz -= 1
+            elif (i.get("age") == "20-64"):
+                att -= 1
+            elif (i.get("age") == "0-5" or i.get("age") == "5-9" or i.get("age") == "10-14" or i.get("age") == "15-19"):
+                giov -= 1
+        fam["family_id"] = id_fam
+        fam["sez"] = sez
+        fam["members"] = mem
+        id_fam += 1
+        pop -= len(mem)
+        famiglie_db["tot_famiglie"] -= 1
+        famiglie_db[str(len(mem))] -= 1
+        if (debug == True):
+            print("Last generated family has a size of ",len(mem))
+            print(famiglie)
+            print(fasce)
+            print(fam)
+            print(giov,att,anz)
+        toberemoved = False
+        return fam, id_fam, giov, att, anz, pop, famiglie_db, toberemoved
+    except:
+        giov = 0
+        att = 0
+        anz = 0
+        fam = {}
+        pop = 0
+        toberemoved = True #Set sez for removal, we have failed generating
+        return fam, id_fam, giov, att, anz, pop, famiglie_db, toberemoved
 
 censimento = json.load(open('Datasets/dataset_completo.geojson'))
 
@@ -61,17 +71,13 @@ collection = db['famiglie']
 db_sezioni = db['sezioni']
 debug = False
 
+
 lastid = 0
 simulated_distribution = []
 id_familiare = 1
 skipped = 0
 
 for i in censimento.get("features"):
-
-    #Sez-2350 has a mismatch in solo 65+ familiesd
-    if (i.get("properties").get("SEZ") == 453 or i.get("properties").get("SEZ") == 2350 or i.get("properties").get("SEZ") == 3755 or i.get("properties").get("SEZ") == 4191 or i.get("properties").get("SEZ") == 4982 or i.get("properties").get("SEZ") == 5072):
-        skipped += 1
-        continue
 
     #Create shortcuts for quick access
     indicatori = i.get("indicatori")
@@ -155,7 +161,7 @@ for i in censimento.get("features"):
         members = []
         if (anziani > 0 and famiglie["1"] > 0):
             members = generate_member("65+",1,members)[0]
-            fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
+            fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie, tbr = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
             generated_families.append(fam)
 
     #Generate families of one
@@ -166,7 +172,7 @@ for i in censimento.get("features"):
             members = generate_member("65+",1,members)[0]
         elif (attivi > 0):
             members = generate_member("20-64",1,members)[0]
-        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
+        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie, tbr = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
         generated_families.append(fam)
 
     #Generate families of 2 components
@@ -175,7 +181,7 @@ for i in censimento.get("features"):
         members = []
         if (anziani > 1):
             members = generate_member("65+",2,members)[0]
-            fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
+            fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie, tbr = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
             generated_families.append(fam)
 
     #Allocate 0-19 to families
@@ -238,7 +244,7 @@ for i in censimento.get("features"):
                     attivi += 1
                 elif (k.get("age") == "65+"):
                     anziani += 1
-            fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
+            fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie, tbr = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
             generated_families.append(fam)
         else:
             for k in members:
@@ -268,7 +274,7 @@ for i in censimento.get("features"):
             members, fasce = generate_member("0-19",1,members,fasce)
             members = generate_member("20-64",1,members)[0]
         if (len(members) == 2):
-            fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
+            fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie, tbr = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
             generated_families.append(fam)
 
     #Generate families of 3 components
@@ -296,7 +302,7 @@ for i in censimento.get("features"):
             members = generate_member("65+",2,members)[0]
         elif (attivi == 0 and anziani > 2):
             members = generate_member("65+",3,members)[0]
-        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
+        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie, tbr = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
         generated_families.append(fam)
 
    #Generate families of 4 components
@@ -348,7 +354,7 @@ for i in censimento.get("features"):
             if debug == True: print("This should not happen. Sez:",i.get("properties").get("SEZ"), "reported a 65+ overflow generation of a size 4 family. (-3)")
             #sys.exit()
             members = generate_member("65+",4,members)[0]
-        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
+        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie, tbr = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
         generated_families.append(fam)
 
     #Generate families of 5 components
@@ -393,7 +399,7 @@ for i in censimento.get("features"):
             members = generate_member("65+",1,members)[0]
         else:    
             members = generate_member("20-64",5,members)[0]
-        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
+        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie, tbr = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
         generated_families.append(fam)
 
     #Generate families of 6 components
@@ -451,13 +457,16 @@ for i in censimento.get("features"):
             members = generate_member("65+",1,members)[0]
         else:
             members = generate_member("20-64",6,members)[0]
-        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
+        fam, id_familiare, giovani, attivi, anziani, popolazione_famiglie, famiglie, tbr = generate_family(members,id_familiare,i.get("properties").get("SEZ"),giovani,attivi,anziani,popolazione_famiglie,famiglie)
         generated_families.append(fam)
 
     #Check that all members of the i-sezione have been allocated to a family
-    if (anziani != 0 or giovani != 0 or attivi != 0 or popolazione_famiglie != 0):
+    if (anziani != 0 or giovani != 0 or attivi != 0 or popolazione_famiglie != 0 or tbr == True):
+        if (tbr == True):
+            print("TBR has been triggered. Failed to generate sez n",i.get("properties").get("SEZ"))
+            skipped += 1
         #TODO: Fix this, happens in a few simulated families
-        if (anziani == 0 and giovani > 0 and attivi == 0):
+        elif (anziani == 0 and giovani > 0 and attivi == 0):
             skipped += 1
         else:
             print("Skipped:",skipped)
@@ -478,12 +487,12 @@ for i in censimento.get("features"):
                 #TODO: Discard sez if we have solo under-19
             sys.exit("BINGO I FUCKED UP: Popolation Count Mismatch")
     else:
-        for family in generated_families:
-            collection.insert_one(family)
-            family.pop("sez")
-            family.pop("_id")
-        db_sezioni.find_one_and_update({'properties.SEZ':i.get("properties").get("SEZ") }, {'$set': {'famiglie': generated_families}})
-        #pass
+        #for family in generated_families:
+        #    collection.insert_one(family)
+        #    family.pop("sez")
+        #    family.pop("_id")
+        #db_sezioni.find_one_and_update({'properties.SEZ':i.get("properties").get("SEZ") }, {'$set': {'famiglie': generated_families}})
+        pass
 print("Sezioni saltate per via di malformazioni tra famiglie e fasce:",skipped)
 print("Sezioni simulate: ",len(simulated_distribution))
 print(np.mean(simulated_distribution))
