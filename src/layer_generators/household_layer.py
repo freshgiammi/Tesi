@@ -499,6 +499,7 @@ def main():
     print("Sezioni saltate per via di malformazioni tra famiglie e fasce:",skipped)
     print("Sezioni simulate: ",len(simulated_distribution))
     print(np.mean(simulated_distribution))
+    return simulated_distribution
 
 # ECDF linear scale
 #plt.style.use('default')
