@@ -77,7 +77,7 @@ def main():
     db_sezioni = db['sezioni']
 
     lastid = 0
-    simulated_distribution = []
+    simulated_distribution = {}
     id_familiare = 1
     skipped = 0
 
@@ -132,7 +132,7 @@ def main():
             for f in fasce:
                 diff[f] = (fasce_percent[f]-fasce_def_percent[f])*100
 
-            simulated_distribution.append(float(np.mean(np.abs(list(diff.values())))))
+            simulated_distribution[i.get("properties").get("SEZ")] = float(np.mean(np.abs(list(diff.values()))))
             fasce = fasce_def
             #sys.exit()    
 
@@ -498,7 +498,7 @@ def main():
             db_sezioni.find_one_and_update({'properties.SEZ':i.get("properties").get("SEZ") }, {'$set': {'famiglie': generated_families}})
     print("Sezioni saltate per via di malformazioni tra famiglie e fasce:",skipped)
     print("Sezioni simulate: ",len(simulated_distribution))
-    print(np.mean(simulated_distribution))
+    print(np.mean(list(simulated_distribution.values())))
     return simulated_distribution
 
 # ECDF linear scale

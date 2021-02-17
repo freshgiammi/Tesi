@@ -22,7 +22,7 @@ def generateClassClique(cl):
     G = (nx.complete_graph(list(class_graph.nodes())))
     return G
 
-def main():
+def main(schools=True):
 
     client = MongoClient('localhost', 27017)
     db = client['tesi']
@@ -56,55 +56,59 @@ def main():
                     graph.nodes[mem["uuid"]]['family_id'] = fam["family_id"]
                     #print(nx.get_edge_attributes(graph,'weight'))
                 
+    if schools==True:
+        print("Generating schools layer...")
+        print("Creating scuole_infanzia layer edges...")
+        school_size = len(list(db_infanzia.find()))
+        for i in list(db_infanzia.find()):
+            #print("Current school:",list(db_infanzia.find()).index(i),"/",school_size, end="\r", flush=True)
+            for classe in i["classi"]:
+                generated_graph = generateClassClique(classe)
+                graph.add_edges_from(generated_graph.edges())
+                if (len(list(generated_graph.edges()))) != 0:
+                    for e in list(generated_graph.edges()):
+                        graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
+                    #print(nx.get_edge_attributes(graph,'weight'))
 
-    print("Creating scuole_infanzia layer edges...")
-    school_size = len(list(db_infanzia.find()))
-    for i in list(db_infanzia.find()):
-        #print("Current school:",list(db_infanzia.find()).index(i),"/",school_size, end="\r", flush=True)
-        for classe in i["classi"]:
-            generated_graph = generateClassClique(classe)
-            graph.add_edges_from(generated_graph.edges())
-            if (len(list(generated_graph.edges()))) != 0:
-                for e in list(generated_graph.edges()):
-                    graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
-                #print(nx.get_edge_attributes(graph,'weight'))
+        print("Creating scuole_elementari layer edges...")
+        school_size = len(list(db_elementari.find()))
+        for i in list(db_elementari.find()):
+            print("Current school:",list(db_elementari.find()).index(i),"/",school_size, end="\r", flush=True)
+            for classe in i["classi"]:
+                generated_graph = generateClassClique(classe)
+                graph.add_edges_from(generated_graph.edges())
+                if (len(list(generated_graph.edges()))) != 0:
+                    for e in list(generated_graph.edges()):
+                        graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
+                    #print(nx.get_edge_attributes(graph,'weight'))
 
-    print("Creating scuole_elementari layer edges...")
-    school_size = len(list(db_elementari.find()))
-    for i in list(db_elementari.find()):
-        print("Current school:",list(db_elementari.find()).index(i),"/",school_size, end="\r", flush=True)
-        for classe in i["classi"]:
-            generated_graph = generateClassClique(classe)
-            graph.add_edges_from(generated_graph.edges())
-            if (len(list(generated_graph.edges()))) != 0:
-                for e in list(generated_graph.edges()):
-                    graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
-                #print(nx.get_edge_attributes(graph,'weight'))
+        print("Creating scuole_media layer edges...")
+        school_size = len(list(db_medie.find()))
+        for i in list(db_medie.find()):
+            print("Current school:",list(db_medie.find()).index(i),"/",school_size, end="\r", flush=True)
+            for classe in i["classi"]:
+                generated_graph = generateClassClique(classe)
+                graph.add_edges_from(generated_graph.edges())
+                if (len(list(generated_graph.edges()))) != 0:
+                    for e in list(generated_graph.edges()):
+                        graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
+                    #print(nx.get_edge_attributes(graph,'weight'))
 
-    print("Creating scuole_media layer edges...")
-    school_size = len(list(db_medie.find()))
-    for i in list(db_medie.find()):
-        print("Current school:",list(db_medie.find()).index(i),"/",school_size, end="\r", flush=True)
-        for classe in i["classi"]:
-            generated_graph = generateClassClique(classe)
-            graph.add_edges_from(generated_graph.edges())
-            if (len(list(generated_graph.edges()))) != 0:
-                for e in list(generated_graph.edges()):
-                    graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
-                #print(nx.get_edge_attributes(graph,'weight'))
+        print("Creating scuole_superiori layer edges...")
+        school_size = len(list(db_superiori.find()))
+        for i in list(db_superiori.find()):
+            print("Current school:",list(db_superiori.find()).index(i),"/",school_size, end="\r", flush=True)
+            for classe in i["classi"]:
+                generated_graph = generateClassClique(classe)
+                graph.add_edges_from(generated_graph.edges())
+                if (len(list(generated_graph.edges()))) != 0:
+                    for e in list(generated_graph.edges()):
+                        graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
+                    #print(nx.get_edge_attributes(graph,'weight'))
 
-    print("Creating scuole_superiori layer edges...")
-    school_size = len(list(db_superiori.find()))
-    for i in list(db_superiori.find()):
-        print("Current school:",list(db_superiori.find()).index(i),"/",school_size, end="\r", flush=True)
-        for classe in i["classi"]:
-            generated_graph = generateClassClique(classe)
-            graph.add_edges_from(generated_graph.edges())
-            if (len(list(generated_graph.edges()))) != 0:
-                for e in list(generated_graph.edges()):
-                    graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
-                #print(nx.get_edge_attributes(graph,'weight'))
-
+    else:
+        print("School layer generation has been disabled.")
+        
     print("Creating workplace layer edges...")
     for i in sez:
         print("Current section:",i["properties"]["SEZ"],"/",max_sez, end="\r", flush=True)
