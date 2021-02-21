@@ -51,6 +51,7 @@ def main(schools=True):
                 if (len(list(generated_graph.edges()))) != 0:
                     for e in list(generated_graph.edges()):
                         graph.edges[e]['weight'] = 1
+                        graph.edges[e]['type'] = "household"
                 for mem in fam["members"]:
                     graph.nodes[mem["uuid"]]['age'] = mem["age"]
                     graph.nodes[mem["uuid"]]['family_id'] = fam["family_id"]
@@ -68,6 +69,7 @@ def main(schools=True):
                 if (len(list(generated_graph.edges()))) != 0:
                     for e in list(generated_graph.edges()):
                         graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
+                        graph.edges[e]['type'] = "school"
                     #print(nx.get_edge_attributes(graph,'weight'))
 
         print("Creating scuole_elementari layer edges...")
@@ -80,6 +82,7 @@ def main(schools=True):
                 if (len(list(generated_graph.edges()))) != 0:
                     for e in list(generated_graph.edges()):
                         graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
+                        graph.edges[e]['type'] = "school"
                     #print(nx.get_edge_attributes(graph,'weight'))
 
         print("Creating scuole_media layer edges...")
@@ -92,6 +95,7 @@ def main(schools=True):
                 if (len(list(generated_graph.edges()))) != 0:
                     for e in list(generated_graph.edges()):
                         graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
+                        graph.edges[e]['type'] = "school"
                     #print(nx.get_edge_attributes(graph,'weight'))
 
         print("Creating scuole_superiori layer edges...")
@@ -104,6 +108,7 @@ def main(schools=True):
                 if (len(list(generated_graph.edges()))) != 0:
                     for e in list(generated_graph.edges()):
                         graph.edges[e]['weight'] = float(np.random.uniform(0.65,1,1)[0])
+                        graph.edges[e]['type'] = "school"
                     #print(nx.get_edge_attributes(graph,'weight'))
 
     else:
@@ -122,6 +127,7 @@ def main(schools=True):
             if (len(list(g_2.edges()))) != 0:
                 for e in list(g_2.edges()):
                     graph.edges[e]['weight'] = float(np.random.uniform(0.3,0.7,1)[0])
+                    graph.edges[e]['type'] = "work"
                 #print(nx.get_edge_attributes(graph,'weight'))
 
             #for lavoratore in i["lavoratori"]:

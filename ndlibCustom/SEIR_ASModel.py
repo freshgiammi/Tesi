@@ -42,6 +42,12 @@ class SEIR_ASModel(CustomDiffusionModel):
                     "range": [0, 1],
                     "optional": False
                 },
+                "schools": {
+                    "descr": "Whether the nodes of the school layer are isolated or not",
+                    "range": [0, 1],
+                    "optional": True,
+                    "default": 1
+                },
                 "tp_rate": {
                     "descr": "Whether if the infection rate depends on the number of infected neighbors",
                     "range": [0, 1],
@@ -76,14 +82,15 @@ class SEIR_ASModel(CustomDiffusionModel):
                 neighbors = self.graph.predecessors(u)
 
             if u_status == 0:  # Susceptible
-
                 infected_neighbors = [v for v in neighbors if self.status[v] == 3 or self.status[v] == 4]
+                
+                if self.params['model']['schools'] == 0:
+                    #Remove nodes connected via school layer
+                    for v in infected_neighbors:
+                        if self.graph.edges[(u,v)]['type'] == "school":
+                            infected_neighbors.pop(v)
+                    
                 triggered = 1 if len(infected_neighbors) > 0 else 0
-
-                #Build edges weight list, use np.mean as multiplier constant for beta value
-                #TODO: Check next step
-                mean_infection_weight = np.mean([self.graph.edges[(u,v)]['weight'] for v in infected_neighbors]) if len(infected_neighbors) > 0 else 0
-
                 if self.params['model']['tp_rate'] == 1:
                     if eventp < 1 - (1 - self.params['model']['beta']) ** len(infected_neighbors):
                         #Toss a coin for A/S
@@ -93,6 +100,8 @@ class SEIR_ASModel(CustomDiffusionModel):
                         else:
                             actual_status[u] = 1  # Exposed_A                  
                 else:
+                    #Build edges weight list, use np.mean as multiplier constant for beta value
+                    mean_infection_weight = np.mean([self.graph.edges[(u,v)]['weight'] for v in infected_neighbors]) if len(infected_neighbors) > 0 else 0
                     if eventp < self.params['model']['beta'] * triggered * mean_infection_weight:
                         #Toss a coin for A/S
                         eventp = np.random.random_sample()
