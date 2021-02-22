@@ -82,13 +82,10 @@ class SEIR_ASModel(CustomDiffusionModel):
                 neighbors = self.graph.predecessors(u)
 
             if u_status == 0:  # Susceptible
-                infected_neighbors = [v for v in neighbors if self.status[v] == 3 or self.status[v] == 4]
-                
                 if self.params['model']['schools'] == 0:
-                    #Remove nodes connected via school layer
-                    for v in infected_neighbors:
-                        if self.graph.edges[(u,v)]['type'] == "school":
-                            infected_neighbors.pop(v)
+                    infected_neighbors = [v for v in neighbors if (self.status[v] == 3 or self.status[v] == 4) and self.graph.edges[(u,v)]['type'] != 'school']
+                else:
+                    infected_neighbors = [v for v in neighbors if self.status[v] == 3 or self.status[v] == 4]
                     
                 triggered = 1 if len(infected_neighbors) > 0 else 0
                 if self.params['model']['tp_rate'] == 1:
