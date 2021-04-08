@@ -78,6 +78,7 @@ def main():
 
     lastid = 0
     simulated_distribution = {}
+    sez_pop = {}
     id_familiare = 1
     skipped = 0
 
@@ -135,7 +136,7 @@ def main():
             simulated_distribution[i.get("properties").get("SEZ")] = float(np.mean(np.abs(list(diff.values()))))
             fasce = fasce_def
             #sys.exit()    
-
+        sez_pop[i['properties']['SEZ']] = popolazione_famiglie
         #Start printing sections data
         print("Generating sezione:",i.get("properties").get("SEZ"), end="\r", flush=True)
 
@@ -499,7 +500,7 @@ def main():
     print("Sezioni saltate per via di malformazioni tra famiglie e fasce:",skipped)
     print("Sezioni simulate: ",len(simulated_distribution))
     print(np.mean(list(simulated_distribution.values())))
-    return simulated_distribution
+    return simulated_distribution, sez_pop
 
 # ECDF linear scale
 #plt.style.use('default')

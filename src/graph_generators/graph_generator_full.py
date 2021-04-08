@@ -54,7 +54,7 @@ def main(schools=True):
                         graph.edges[e]['type'] = "household"
                 for mem in fam["members"]:
                     graph.nodes[mem["uuid"]]['age'] = mem["age"]
-                    graph.nodes[mem["uuid"]]['family_id'] = fam["family_id"]
+                    graph.nodes[mem["uuid"]]['sez'] = i["properties"]["SEZ"]
                     #print(nx.get_edge_attributes(graph,'weight'))
                 
     if schools==True:
